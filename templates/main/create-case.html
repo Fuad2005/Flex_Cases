@@ -1,0 +1,995 @@
+{% load static %}
+#TODO add sidebar style classes
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Case | Flex Cases</title>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+
+            background: #f5f7fb;
+            color: #111827;
+        }
+
+        /* =========================
+           LAYOUT
+        ========================= */
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+
+            background: #ffffff;
+
+            border-right: 1px solid #e5e7eb;
+
+            padding: 24px 16px;
+
+            display: flex;
+            flex-direction: column;
+
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 0 10px;
+
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #111827;
+            color: #ffffff;
+
+            border-radius: 11px;
+
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .logo-text {
+            font-size: 17px;
+            font-weight: 700;
+
+            color: #111827;
+        }
+
+
+        /* =========================
+           NAVIGATION
+        ========================= */
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+
+            gap: 5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 11px 12px;
+
+            border-radius: 9px;
+
+            color: #6b7280;
+
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .nav-item.active {
+            background: #f3f4f6;
+            color: #111827;
+
+            font-weight: 600;
+        }
+
+        .nav-item svg {
+            width: 18px;
+            height: 18px;
+
+            flex-shrink: 0;
+        }
+
+
+        /* =========================
+           SIDEBAR BOTTOM
+        ========================= */
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+
+            gap: 11px;
+
+            padding: 12px 10px;
+
+            margin-bottom: 8px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #111827;
+            color: #ffffff;
+
+            border-radius: 50%;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            flex-shrink: 0;
+        }
+
+        .user-details {
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+
+            color: #111827;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 12px;
+
+            color: #9ca3af;
+
+            margin-top: 2px;
+        }
+
+
+        /* =========================
+           LOGOUT
+        ========================= */
+
+        .logout-form {
+            width: 100%;
+        }
+
+        .logout-button {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 11px 12px;
+
+            border: none;
+
+            background: transparent;
+
+            border-radius: 9px;
+
+            color: #6b7280;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            cursor: pointer;
+
+            text-align: left;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .logout-button:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .logout-button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+
+        /* =========================
+           MAIN CONTENT
+        ========================= */
+
+        .main {
+            margin-left: 250px;
+
+            width: calc(100% - 250px);
+
+            min-height: 100vh;
+
+            padding: 35px 40px;
+        }
+
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 32px;
+        }
+
+        .page-title h1 {
+            font-size: 26px;
+            font-weight: 700;
+
+            color: #111827;
+
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            font-size: 14px;
+
+            color: #6b7280;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 9px 13px;
+
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+
+            color: #374151;
+
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .back-button:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .back-button svg {
+            width: 17px;
+            height: 17px;
+        }
+
+
+        /* =========================
+           FORM CARD
+        ========================= */
+
+        .form-card {
+            width: 100%;
+            max-width: 850px;
+
+            background: #ffffff;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 16px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-header {
+            padding-bottom: 24px;
+
+            margin-bottom: 26px;
+
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .form-header h2 {
+            font-size: 18px;
+            font-weight: 650;
+
+            color: #111827;
+
+            margin-bottom: 5px;
+        }
+
+        .form-header p {
+            font-size: 13px;
+
+            color: #9ca3af;
+        }
+
+
+        /* =========================
+           FORM
+        ========================= */
+        .employee-select {
+            min-height: 120px;
+            cursor: pointer;
+        }
+
+        .employee-select option {
+            padding: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 13px;
+
+            font-weight: 600;
+
+            color: #374151;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .form-control {
+            width: 100%;
+
+            padding: 11px 13px;
+
+            background: #ffffff;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 9px;
+
+            color: #111827;
+
+            font-family: inherit;
+
+            font-size: 14px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-control:focus {
+            border-color: #111827;
+
+            box-shadow:
+                0 0 0 3px rgba(17, 24, 39, 0.07);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+
+            resize: vertical;
+
+            line-height: 1.5;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .field-help {
+            font-size: 12px;
+
+            color: #9ca3af;
+        }
+
+
+        /* =========================
+           ERROR
+        ========================= */
+
+        .error-message {
+            margin-bottom: 24px;
+
+            padding: 12px 14px;
+
+            background: #fef2f2;
+
+            border: 1px solid #fecaca;
+
+            border-radius: 9px;
+
+            color: #b91c1c;
+
+            font-size: 13px;
+        }
+
+        .error-message p {
+            margin: 0;
+        }
+
+        .error-message p + p {
+            margin-top: 5px;
+        }
+
+
+        /* =========================
+           FORM ACTIONS
+        ========================= */
+
+        .form-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            margin-top: 30px;
+
+            padding-top: 24px;
+
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .cancel-button {
+            padding: 11px 17px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 9px;
+
+            background: #ffffff;
+
+            color: #374151;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            text-decoration: none;
+
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .cancel-button:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .create-button {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 11px 18px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #111827;
+            color: #ffffff;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                transform 0.1s ease;
+        }
+
+        .create-button:hover {
+            background: #1f2937;
+        }
+
+        .create-button:active {
+            transform: scale(0.98);
+        }
+
+        .create-button svg {
+            width: 17px;
+            height: 17px;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 850px) {
+
+            .sidebar {
+                width: 70px;
+
+                padding: 20px 10px;
+            }
+
+            .logo-container {
+                justify-content: center;
+
+                padding: 0;
+
+                margin-bottom: 30px;
+            }
+
+            .logo-text,
+            .nav-item span,
+            .user-details,
+            .logout-button span {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+
+                padding: 12px;
+            }
+
+            .user-info {
+                justify-content: center;
+
+                padding: 12px 0;
+            }
+
+            .logout-button {
+                justify-content: center;
+
+                padding: 12px;
+            }
+
+            .main {
+                margin-left: 70px;
+
+                width: calc(100% - 70px);
+
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .main {
+                padding: 20px 15px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+
+                gap: 15px;
+
+                flex-direction: column;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+
+                align-items: stretch;
+            }
+
+            .cancel-button,
+            .create-button {
+                width: 100%;
+
+                justify-content: center;
+
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">
+                FC
+            </div>
+
+            <div class="brand-name">
+                Flex Cases
+            </div>
+        </div>
+
+        <nav class="navigation">
+
+            <div class="nav-label">
+                Menu
+            </div>
+
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a href="#" class="nav-item">
+                <span class="nav-icon">▣</span>
+                Cases
+            </a>
+
+            <a href={% url 'create-case' %} class="nav-item">
+                <span class="nav-icon">+</span>
+                Create a Case
+            </a>
+
+            <a href="#" class="nav-item">
+                <span class="nav-icon">◷</span>
+                Activity
+            </a>
+
+            <div class="nav-label" style="margin-top: 28px;">
+                Account
+            </div>
+
+            <a href="#" class="nav-item">
+                <span class="nav-icon">⚙</span>
+                Settings
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <div class="user-avatar">
+                    {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+                </div>
+
+                <div class="user-info">
+                    <div class="user-name">
+                        {{ person.first_name }} {{ person.last_name }}
+                    </div>
+
+                    <div class="user-role">
+                        {% if request.user.is_superuser  %}
+                            Admin
+                           
+                        {% elif person.person_type == "employee" %}    
+                            Employee
+
+                        {% elif person.person_type == "manager" %}
+                            Manager
+                        
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <main class="main">
+
+        <!-- Top Bar -->
+
+        <div class="topbar">
+
+            <div class="page-title">
+
+                <h1>
+                    Create Case
+                </h1>
+
+                <p>
+                    Create a new case and add the necessary details.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="back-button"
+            >
+                <i data-lucide="arrow-left"></i>
+
+                Back to dashboard
+            </a>
+
+        </div>
+
+
+        <!-- Form -->
+
+        <div class="form-card">
+
+            <div class="form-header">
+
+                <h2>
+                    Case Information
+                </h2>
+
+                <p>
+                    Fill in the information below to create a new case.
+                </p>
+
+            </div>
+
+
+            <!-- Errors -->
+
+            {% if form.errors %}
+
+                <div class="error-message">
+
+                    {% for field in form %}
+
+                        {% for error in field.errors %}
+
+                            <p>
+                                {{ error }}
+                            </p>
+
+                        {% endfor %}
+
+                    {% endfor %}
+
+
+                    {% for error in form.non_field_errors %}
+
+                        <p>
+                            {{ error }}
+                        </p>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+                    <!-- Case Name -->
+
+                    <div class="form-group full-width">
+
+                        <label for="id_name">
+                            Case name
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="id_name"
+                            name="name"
+                            class="form-control"
+                            placeholder="Enter a short name for the case"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Description -->
+
+                    <div class="form-group full-width">
+
+                        <label for="id_description">
+                            Description
+                            <span class="required">*</span>
+                        </label>
+
+                        <textarea
+                            id="id_description"
+                            name="description"
+                            class="form-control"
+                            placeholder="Describe the problem or case in detail..."
+                            required
+                        ></textarea>
+
+                        <span class="field-help">
+                            Include any relevant information that could help resolve the case.
+                        </span>
+
+                    </div>
+
+
+                    <!-- Assign Employees -->
+
+                    <div class="form-group full-width">
+
+                        <label for="id_assigned_to">
+                            Assign to employees
+                        </label>
+
+                        <select
+                            id="id_assigned_to"
+                            name="assigned_to"
+                            class="form-control employee-select"
+                            multiple
+                        >
+
+                            {% for employee in employees %}
+
+                                <option value="{{ employee.id }}">
+                                    {{ employee.first_name }} {{ employee.last_name }}
+                                </option>
+
+                            {% empty %}
+
+                                <option disabled>
+                                    No employees available
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <span class="field-help">
+                            Hold Command (Mac) or Ctrl (Windows) to select multiple employees.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Actions -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{% url 'dashboard' %}"
+                        class="cancel-button"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="create-button"
+                    >
+                        <i data-lucide="plus"></i>
+                        Create case
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+    lucide.createIcons();
+</script>
+
+</body>
+</html>

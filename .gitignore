@@ -1,0 +1,53 @@
+# Virtual environment
+venv/
+.venv/
+env/
+projectenv/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+
+# Django migrations
+# Don't ignore migrations — they should normally be committed.
+
+# Static files generated for production
+staticfiles/
+
+# User-uploaded media
+media/
+
+# IDEs / editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build / distribution
+build/
+dist/
+*.egg-info/
+
+# Environment / tooling
+.mypy_cache/
+.ruff_cache/

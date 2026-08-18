@@ -1,0 +1,1224 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Flex Cases</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --muted: #6b7280;
+            --light-muted: #9ca3af;
+            --primary: #111827;
+            --hover: #f3f4f6;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .small-icon {
+            width: 15px;
+            height: 15px;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            width: var(--sidebar-width);
+            height: 100vh;
+
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+
+            display: flex;
+            flex-direction: column;
+
+            padding: 24px 16px;
+
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 0 10px;
+            margin-bottom: 36px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--primary);
+            color: white;
+
+            border-radius: 11px;
+
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .brand-name {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .navigation {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            padding: 0 12px;
+            margin-bottom: 8px;
+
+            color: var(--light-muted);
+
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 11px 12px;
+
+            border-radius: 9px;
+
+            color: var(--muted);
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: #f0f1f3;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            padding: 12px;
+
+            border-top: 1px solid var(--border);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: #e5e7eb;
+            color: #374151;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .user-info {
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            margin-left: var(--sidebar-width);
+
+            min-height: 100vh;
+
+            padding: 28px 36px;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 42px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .page-title p {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid var(--border);
+            border-radius: 9px;
+
+            background: var(--surface);
+
+            color: var(--muted);
+
+            cursor: pointer;
+
+            font-size: 17px;
+
+            transition: 0.2s ease;
+        }
+
+        .notification:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 5px 10px 5px 5px;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            background: var(--surface);
+        }
+
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 7px;
+
+            background: var(--primary);
+            color: white;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .profile-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* =========================
+           WELCOME
+        ========================= */
+
+        .welcome {
+            margin-bottom: 28px;
+        }
+
+        .welcome h2 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        .welcome p {
+            margin-top: 6px;
+
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* =========================
+           STATS
+        ========================= */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 16px;
+
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            padding: 20px;
+
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+            border-radius: 14px;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 18px;
+        }
+
+        .stat-title {
+            color: var(--muted);
+
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 34px;
+            height: 34px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background: #f3f4f6;
+
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-size: 27px;
+            font-weight: 700;
+
+            letter-spacing: -0.8px;
+        }
+
+        .stat-change {
+            margin-top: 7px;
+
+            color: #6b7280;
+
+            font-size: 11px;
+        }
+
+        /* =========================
+           CONTENT GRID
+        ========================= */
+
+        .content-grid {
+            display: grid;
+
+            grid-template-columns: 1.5fr 1fr;
+
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--surface);
+
+            border: 1px solid var(--border);
+            border-radius: 14px;
+
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 20px;
+
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 650;
+        }
+
+        .card-header a {
+            color: var(--muted);
+
+            text-decoration: none;
+
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .card-header a:hover {
+            color: var(--text);
+        }
+
+        /* =========================
+           ACTIVITY
+        ========================= */
+
+        .activity {
+            padding: 4px 20px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            padding: 16px 0;
+
+            border-bottom: 1px solid #f0f1f3;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 34px;
+            height: 34px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 8px;
+
+            background: #f3f4f6;
+
+            font-size: 13px;
+        }
+
+        .activity-content {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .activity-description {
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        .activity-time {
+            color: var(--light-muted);
+
+            font-size: 11px;
+
+            white-space: nowrap;
+        }
+
+        /* =========================
+           QUICK ACTIONS
+        ========================= */
+
+        .actions {
+            padding: 16px;
+        }
+
+        .action {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            width: 100%;
+
+            padding: 13px;
+
+            margin-bottom: 8px;
+
+            border: 1px solid transparent;
+            border-radius: 9px;
+
+            background: transparent;
+
+            color: var(--text);
+
+            text-decoration: none;
+
+            transition: 0.2s ease;
+        }
+
+        .action:last-child {
+            margin-bottom: 0;
+        }
+
+        .action:hover {
+            background: var(--hover);
+            border-color: var(--border);
+        }
+
+        .action-icon {
+            width: 36px;
+            height: 36px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: #f3f4f6;
+
+            font-size: 14px;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .action-description {
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        .action-arrow {
+            color: var(--light-muted);
+
+            font-size: 16px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        .mobile-header {
+            display: none;
+        }
+
+        @media (max-width: 1100px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                margin-bottom: 30px;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .mobile-logo {
+                width: 36px;
+                height: 36px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                border-radius: 9px;
+
+                background: var(--primary);
+                color: white;
+
+                font-size: 13px;
+                font-weight: 700;
+            }
+
+            .topbar {
+                margin-bottom: 30px;
+            }
+
+            .topbar-right {
+                display: none;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .main {
+                padding: 16px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome h2 {
+                font-size: 20px;
+            }
+
+            .page-title h1 {
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">
+                FC
+            </div>
+
+            <div class="brand-name">
+                Flex Cases
+            </div>
+        </div>
+
+        <nav class="navigation">
+
+            <div class="nav-label">
+                Menu
+            </div>
+
+            <a href="#" class="nav-item active">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+
+            <a href="#" class="nav-item">
+                <span class="nav-icon">▣</span>
+                Cases
+            </a>
+
+            <a href={% url 'create-case' %} class="nav-item">
+                <span class="nav-icon">+</span>
+                Create a Case
+            </a>
+
+            <a href="#" class="nav-item">
+                <span class="nav-icon">◷</span>
+                Activity
+            </a>
+
+            <div class="nav-label" style="margin-top: 28px;">
+                Account
+            </div>
+
+            <a href="#" class="nav-item">
+                <span class="nav-icon">⚙</span>
+                Settings
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="user-mini">
+
+                <div class="user-avatar">
+                    {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+                </div>
+
+                <div class="user-info">
+                    <div class="user-name">
+                        {{ person.first_name }} {{ person.last_name }}
+                    </div>
+
+                    <div class="user-role">
+                        {% if request.user.is_superuser  %}
+                            Admin
+                           
+                        {% elif person.person_type == "employee" %}    
+                            Employee
+
+                        {% elif person.person_type == "manager" %}
+                            Manager
+                        
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- Main Content -->
+
+    <main class="main">
+
+        <!-- Mobile header -->
+
+        <div class="mobile-header">
+
+            <div class="mobile-brand">
+
+                <div class="mobile-logo">
+                    FC
+                </div>
+
+                Flex Cases
+
+            </div>
+
+            <div class="user-avatar">
+                {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+            </div>
+
+        </div>
+
+
+        <!-- Top bar -->
+
+        <div class="topbar">
+
+            <div class="page-title">
+
+                <h1>Dashboard</h1>
+
+                <p>
+                    Overview of your workspace
+                </p>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+
+                    <button class="notification" type="submit">
+                        <i data-lucide="log-out" class="small-icon"></i>
+                    </button>
+                </form>
+
+                <div class="profile">
+
+                    <div class="profile-avatar">
+                        {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+                    </div>
+
+                    <div class="profile-name">
+                        {{ person.first_name }} {{ person.last_name }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Welcome -->
+
+        <section class="welcome">
+
+            <h2>
+                Welcome back{% if person.first_name %},
+                {{ person.first_name }}{% endif %}.
+            </h2>
+
+            <p>
+                Here's what's happening with your workspace today.
+            </p>
+
+        </section>
+
+
+        <!-- Statistics -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        Total Cases
+                    </span>
+
+                    <div class="stat-icon">
+                        ▣
+                    </div>
+
+                </div>
+
+                <div class="stat-value">
+                    {{ all_cases.count }}
+                </div>
+
+                <div class="stat-change">
+                    Active cases
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        Open Cases
+                    </span>
+
+                    <div class="stat-icon">
+                        ◴
+                    </div>
+
+                </div>
+
+                <div class="stat-value">
+                    {{ working_cases.count }}
+                </div>
+
+                <div class="stat-change">
+                    Currently being worked on
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        Completed
+                    </span>
+
+                    <div class="stat-icon">
+                        ✓
+                    </div>
+
+                </div>
+
+                <div class="stat-value">
+                    {{ completed_cases.count }}
+                </div>
+
+                <div class="stat-change">
+                    Cases completed
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        Team Members
+                    </span>
+
+                    <div class="stat-icon">
+                        ◉
+                    </div>
+
+                </div>
+
+                <div class="stat-value">
+                    {{ employees.count }}
+                </div>
+
+                <div class="stat-change">
+                    Employee count
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Bottom content -->
+
+        <section class="content-grid">
+
+
+            <!-- Recent activity -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h3>
+                        Recent Activity
+                    </h3>
+
+                    <a href="#">
+                        View all
+                    </a>
+
+                </div>
+
+                <div class="activity">
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            +
+                        </div>
+
+                        <div class="activity-content">
+
+                            <div class="activity-title">
+                                New case created
+                            </div>
+
+                            <div class="activity-description">
+                                Case #FC-1024 was created
+                            </div>
+
+                        </div>
+
+                        <div class="activity-time">
+                            10 min ago
+                        </div>
+
+                    </div>
+
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            ✓
+                        </div>
+
+                        <div class="activity-content">
+
+                            <div class="activity-title">
+                                Task completed
+                            </div>
+
+                            <div class="activity-description">
+                                Review case documentation
+                            </div>
+
+                        </div>
+
+                        <div class="activity-time">
+                            1 hour ago
+                        </div>
+
+                    </div>
+
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            ◉
+                        </div>
+
+                        <div class="activity-content">
+
+                            <div class="activity-title">
+                                Case assigned
+                            </div>
+
+                            <div class="activity-description">
+                                Case #FC-1021 assigned to your team
+                            </div>
+
+                        </div>
+
+                        <div class="activity-time">
+                            3 hours ago
+                        </div>
+
+                    </div>
+
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            ↻
+                        </div>
+
+                        <div class="activity-content">
+
+                            <div class="activity-title">
+                                Case updated
+                            </div>
+
+                            <div class="activity-description">
+                                Case #FC-1018 information was updated
+                            </div>
+
+                        </div>
+
+                        <div class="activity-time">
+                            Yesterday
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Quick actions -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h3>
+                        Quick Actions
+                    </h3>
+
+                </div>
+
+                <div class="actions">
+
+                    <a href="#" class="action">
+
+                        <div class="action-icon">
+                            +
+                        </div>
+
+                        <div class="action-content">
+
+                            <div class="action-title">
+                                Create a case
+                            </div>
+
+                            <div class="action-description">
+                                Start a new case
+                            </div>
+
+                        </div>
+
+                        <div class="action-arrow">
+                            →
+                        </div>
+
+                    </a>
+
+
+                    <a href="#" class="action">
+
+                        <div class="action-icon">
+                            ✓
+                        </div>
+
+                        <div class="action-content">
+
+                            <div class="action-title">
+                                View tasks
+                            </div>
+
+                            <div class="action-description">
+                                Check your pending tasks
+                            </div>
+
+                        </div>
+
+                        <div class="action-arrow">
+                            →
+                        </div>
+
+                    </a>
+
+
+                    <a href="#" class="action">
+
+                        <div class="action-icon">
+                            ◉
+                        </div>
+
+                        <div class="action-content">
+
+                            <div class="action-title">
+                                Team members
+                            </div>
+
+                            <div class="action-description">
+                                View your team
+                            </div>
+
+                        </div>
+
+                        <div class="action-arrow">
+                            →
+                        </div>
+
+                    </a>
+
+
+                    <a href="#" class="action">
+
+                        <div class="action-icon">
+                            ⚙
+                        </div>
+
+                        <div class="action-content">
+
+                            <div class="action-title">
+                                Settings
+                            </div>
+
+                            <div class="action-description">
+                                Manage your account
+                            </div>
+
+                        </div>
+
+                        <div class="action-arrow">
+                            →
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
