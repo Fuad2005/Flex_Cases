@@ -1,0 +1,834 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Staff Directory | Flex Cases</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --muted: #6b7280;
+            --light-muted: #9ca3af;
+            --primary: #111827;
+            --hover: #f3f4f6;
+            --sidebar-width: 250px;
+
+            /* Badge Colors */
+            --role-manager-bg: #eff6ff;
+            --role-manager-text: #1d4ed8;
+            --role-employee-bg: #f3f4f6;
+            --role-employee-text: #374151;
+            --role-admin-bg: #fef3c7;
+            --role-admin-text: #b45309;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .small-icon {
+            width: 15px;
+            height: 15px;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            width: var(--sidebar-width);
+            height: 100vh;
+
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+
+            display: flex;
+            flex-direction: column;
+
+            padding: 24px 16px;
+
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 0 10px;
+            margin-bottom: 36px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--primary);
+            color: white;
+
+            border-radius: 11px;
+
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .brand-name {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .navigation {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            padding: 0 12px;
+            margin-bottom: 8px;
+
+            color: var(--light-muted);
+
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding: 11px 12px;
+
+            border-radius: 9px;
+
+            color: var(--muted);
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: #f0f1f3;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            padding: 12px;
+
+            border-top: 1px solid var(--border);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: #e5e7eb;
+            color: #374151;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .user-info {
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 99;
+        }
+
+        .main {
+            margin-left: var(--sidebar-width);
+
+            min-height: 100vh;
+
+            padding: 28px 36px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 32px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .page-title p {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid var(--border);
+            border-radius: 9px;
+
+            background: var(--surface);
+
+            color: var(--muted);
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .notification:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 5px 10px 5px 5px;
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            background: var(--surface);
+        }
+
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 7px;
+
+            background: var(--primary);
+            color: white;
+
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .profile-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Toolbar & Controls */
+        .controls-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-muted);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 9px 12px 9px 36px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            background: var(--bg);
+            color: var(--text);
+            transition: 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: #9ca3af;
+            background: var(--surface);
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
+        }
+
+        .staff-count-summary {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        /* Section Separator */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 32px 0 18px;
+        }
+
+        .section-header:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e5e7eb;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .section-divider {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Staff Cards Grid */
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .staff-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .staff-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .staff-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .staff-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .staff-avatar-large {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .role-badge-manager {
+            background: var(--role-manager-bg);
+            color: var(--role-manager-text);
+        }
+
+        .role-badge-employee {
+            background: var(--role-employee-bg);
+            color: var(--role-employee-text);
+        }
+
+        .role-badge-admin {
+            background: var(--role-admin-bg);
+            color: var(--role-admin-text);
+        }
+
+        .staff-details h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .staff-details p {
+            font-size: 12px;
+            color: var(--muted);
+            word-break: break-all;
+        }
+
+        .staff-stats {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #f0f1f3;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .empty-section {
+            background: var(--surface);
+            border: 1px border-dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .mobile-header {
+            display: none;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 30px;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .mobile-logo {
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 9px;
+                background: var(--primary);
+                color: white;
+                font-size: 13px;
+                font-weight: 700;
+            }
+
+            .topbar {
+                margin-bottom: 24px;
+            }
+
+            .topbar-right {
+                display: none;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .main {
+                padding: 16px;
+            }
+
+            .staff-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-logo">FC</div>
+            <div class="brand-name">Flex Cases</div>
+        </div>
+
+        <nav class="navigation">
+            <div class="nav-label">Menu</div>
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+                Dashboard
+            </a>
+            <a href="{% url 'all-cases' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="briefcase"></i></span>
+                Cases
+            </a>
+            {% if person.person_type == 'manager' %}
+            <a href="{% url 'create-case' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="plus"></i></span>
+                Create a Case
+            </a>
+            <a href="{% url 'add-employee' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="user-pen"></i></span>
+                Add Employee
+            </a>
+            {% endif %}
+            <a href="{% url 'staff' %}" class="nav-item active">
+                <span class="nav-icon"><i data-lucide="user"></i></span>
+                Staff
+            </a>
+
+            
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="user-mini">
+                <div class="user-avatar">
+                    {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">{{ person.first_name }} {{ person.last_name }}</div>
+                    <div class="user-role">
+                        {% if request.user.is_superuser %} Admin
+                        {% elif person.person_type == "employee" %} Employee
+                        {% elif person.person_type == "manager" %} Manager
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="mobile-header">
+            <div class="mobile-brand">
+                <button class="menu-toggle" id="menuToggle" aria-label="Open Menu">
+                    <i data-lucide="menu" class="small-icon"></i>
+                </button>
+                <div class="mobile-logo">FC</div>
+                Flex Cases
+            </div>
+            <div class="user-avatar">
+                {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+            </div>
+        </div>
+
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Staff Directory</h1>
+                <p>Overview of managers and team members in your organization</p>
+            </div>
+
+            <div class="topbar-right">
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="notification" type="submit" aria-label="Logout">
+                        <i data-lucide="log-out" class="small-icon"></i>
+                    </button>
+                </form>
+
+                <div class="profile">
+                    <div class="profile-avatar">
+                        {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+                    </div>
+                    <div class="profile-name">
+                        {{ person.first_name }} {{ person.last_name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-card">
+            <div class="search-box">
+                <i data-lucide="search" class="small-icon search-icon"></i>
+                <input type="text" id="staffSearchInput" class="search-input" placeholder="Search staff members by name...">
+            </div>
+            <div class="staff-count-summary">
+                Managers: <strong>{{ managers.count|default:"0" }}</strong> &nbsp;|&nbsp; 
+                Employees: <strong>{{ employees.count|default:"0" }}</strong>
+            </div>
+        </div>
+
+        <!-- SECTION: MANAGERS -->
+        <div class="section-header">
+            <div class="section-title">
+                <i data-lucide="shield-check" class="small-icon" style="color: #2563eb;"></i>
+                Managers
+                <span class="section-badge">{{ managers.count|default:"0" }}</span>
+            </div>
+            <div class="section-divider"></div>
+        </div>
+
+        <div class="staff-grid" id="managersGrid">
+            {% for manager in managers %}
+            <div class="staff-card" data-name="{{ manager.first_name|lower }} {{ manager.last_name|lower }}">
+                <div>
+                    <div class="staff-header">
+                        <div class="staff-avatar-large">
+                            {{ manager.first_name|slice:":1"|upper }}{{ manager.last_name|slice:":1"|upper }}
+                        </div>
+                        <span class="role-badge role-badge-manager">
+                            <i data-lucide="award" class="small-icon"></i> Manager
+                        </span>
+                    </div>
+
+                    <div class="staff-details">
+                        <h3>{{ manager.first_name }} {{ manager.last_name }}</h3>
+                        {% comment %} <p>{{ manager.user.email|default:"No email provided" }}</p> {% endcomment %}
+                    </div>
+                </div>
+
+                <div class="staff-stats">
+                    <span>Active Cases</span>
+                    <strong>{{ manager.cases.count|default:"0" }}</strong>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-section" style="grid-column: 1 / -1;">
+                No managers found.
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- SECTION DIVIDER & EMPLOYEES -->
+        <div class="section-header" style="margin-top: 40px;">
+            <div class="section-title">
+                <i data-lucide="users" class="small-icon" style="color: #4b5563;"></i>
+                Employees
+                <span class="section-badge">{{ employees.count|default:"0" }}</span>
+            </div>
+            <div class="section-divider"></div>
+        </div>
+
+        <div class="staff-grid" id="employeesGrid">
+            {% for employee in employees %}
+                <a href="{% url 'all-cases' %}?assigned_to={{ employee.id }}" class="staff-card-link">
+                    <div class="staff-card" data-name="{{ employee.first_name|lower }} {{ employee.last_name|lower }}">
+                        <div>
+                            <div class="staff-header">
+                                <div class="staff-avatar-large">
+                                    {{ employee.first_name|slice:":1"|upper }}{{ employee.last_name|slice:":1"|upper }}
+                                </div>
+                                <span class="role-badge role-badge-employee">
+                                    <i data-lucide="user" class="small-icon"></i> Employee
+                                </span>
+                            </div>
+
+                            <div class="staff-details">
+                                <h3>{{ employee.first_name }} {{ employee.last_name }}</h3>
+                                {% comment %} <p>{{ employee.user.email|default:"No email provided" }}</p> {% endcomment %}
+                            </div>
+                        </div>
+
+                        <div class="staff-stats">
+                            <span>Assigned Cases</span>
+                            <strong>{{ employee.cases.count|default:"0" }}</strong>
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="empty-section" style="grid-column: 1 / -1;">
+                    No employees found.
+                </div>
+                {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        // Sidebar Navigation
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Staff Search Filter
+        const searchInput = document.getElementById('staffSearchInput');
+        const staffCards = document.querySelectorAll('.staff-card');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                staffCards.forEach(card => {
+                    const name = card.dataset.name;
+                    card.style.display = name.includes(query) ? 'flex' : 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -26,19 +26,20 @@
             --primary: #111827;
             --hover: #f3f4f6;
             --sidebar-width: 250px;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
         }
 
         body {
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
                          Roboto, Helvetica, Arial, sans-serif;
-
             background: var(--bg);
             color: var(--text);
         }
 
         /* =========================
-           SIDEBAR
+           SIDEBAR & ICONS
         ========================= */
 
         .small-icon {
@@ -46,30 +47,34 @@
             height: 15px;
         }
 
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-
             width: var(--sidebar-width);
             height: 100vh;
-
             background: var(--surface);
             border-right: 1px solid var(--border);
-
             display: flex;
             flex-direction: column;
-
             padding: 24px 16px;
-
             z-index: 100;
+            transition: transform 0.3s ease;
         }
 
         .brand {
             display: flex;
             align-items: center;
             gap: 12px;
-
             padding: 0 10px;
             margin-bottom: 36px;
         }
@@ -77,16 +82,12 @@
         .brand-logo {
             width: 40px;
             height: 40px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             background: var(--primary);
             color: white;
-
             border-radius: 11px;
-
             font-size: 16px;
             font-weight: 700;
         }
@@ -106,9 +107,7 @@
         .nav-label {
             padding: 0 12px;
             margin-bottom: 8px;
-
             color: var(--light-muted);
-
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
@@ -119,17 +118,12 @@
             display: flex;
             align-items: center;
             gap: 12px;
-
             padding: 11px 12px;
-
             border-radius: 9px;
-
             color: var(--muted);
             text-decoration: none;
-
             font-size: 14px;
             font-weight: 500;
-
             transition: 0.2s ease;
         }
 
@@ -144,12 +138,6 @@
             font-weight: 600;
         }
 
-        .nav-icon {
-            width: 20px;
-            text-align: center;
-            font-size: 16px;
-        }
-
         .sidebar-bottom {
             margin-top: auto;
         }
@@ -158,27 +146,20 @@
             display: flex;
             align-items: center;
             gap: 11px;
-
             padding: 12px;
-
             border-top: 1px solid var(--border);
         }
 
         .user-avatar {
             width: 36px;
             height: 36px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             flex-shrink: 0;
-
             border-radius: 50%;
-
             background: #e5e7eb;
             color: #374151;
-
             font-size: 13px;
             font-weight: 700;
         }
@@ -190,7 +171,6 @@
         .user-name {
             font-size: 13px;
             font-weight: 600;
-
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -198,9 +178,7 @@
 
         .user-role {
             margin-top: 2px;
-
             color: var(--muted);
-
             font-size: 11px;
         }
 
@@ -210,9 +188,7 @@
 
         .main {
             margin-left: var(--sidebar-width);
-
             min-height: 100vh;
-
             padding: 28px 36px;
         }
 
@@ -224,7 +200,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             margin-bottom: 42px;
         }
 
@@ -236,9 +211,7 @@
 
         .page-title p {
             margin-top: 5px;
-
             color: var(--muted);
-
             font-size: 13px;
         }
 
@@ -251,22 +224,15 @@
         .notification {
             width: 40px;
             height: 40px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             border: 1px solid var(--border);
             border-radius: 9px;
-
             background: var(--surface);
-
             color: var(--muted);
-
             cursor: pointer;
-
             font-size: 17px;
-
             transition: 0.2s ease;
         }
 
@@ -279,28 +245,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
-
             padding: 5px 10px 5px 5px;
-
             border: 1px solid var(--border);
             border-radius: 10px;
-
             background: var(--surface);
         }
 
         .profile-avatar {
             width: 30px;
             height: 30px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             border-radius: 7px;
-
             background: var(--primary);
             color: white;
-
             font-size: 11px;
             font-weight: 700;
         }
@@ -326,7 +285,6 @@
 
         .welcome p {
             margin-top: 6px;
-
             color: var(--muted);
             font-size: 14px;
         }
@@ -337,45 +295,33 @@
 
         .stats {
             display: grid;
-
             grid-template-columns: repeat(4, 1fr);
-
             gap: 16px;
-
             margin-bottom: 28px;
         }
 
         .stat-card {
             padding: 20px;
-
             background: var(--surface);
-
             border: 1px solid var(--border);
             border-radius: 14px;
-
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-2px);
-
-            box-shadow:
-                0 8px 25px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
         }
 
         .stat-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             margin-bottom: 18px;
         }
 
         .stat-title {
             color: var(--muted);
-
             font-size: 13px;
             font-weight: 500;
         }
@@ -383,30 +329,23 @@
         .stat-icon {
             width: 34px;
             height: 34px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             border-radius: 8px;
-
             background: #f3f4f6;
-
-            font-size: 14px;
+            color: var(--text);
         }
 
         .stat-value {
             font-size: 27px;
             font-weight: 700;
-
             letter-spacing: -0.8px;
         }
 
         .stat-change {
             margin-top: 7px;
-
             color: #6b7280;
-
             font-size: 11px;
         }
 
@@ -416,18 +355,14 @@
 
         .content-grid {
             display: grid;
-
             grid-template-columns: 1.5fr 1fr;
-
             gap: 20px;
         }
 
         .card {
             background: var(--surface);
-
             border: 1px solid var(--border);
             border-radius: 14px;
-
             overflow: hidden;
         }
 
@@ -435,9 +370,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             padding: 20px;
-
             border-bottom: 1px solid var(--border);
         }
 
@@ -448,9 +381,7 @@
 
         .card-header a {
             color: var(--muted);
-
             text-decoration: none;
-
             font-size: 12px;
             font-weight: 500;
         }
@@ -460,7 +391,7 @@
         }
 
         /* =========================
-           ACTIVITY
+           RECENT CASES
         ========================= */
 
         .activity {
@@ -471,10 +402,10 @@
             display: flex;
             align-items: center;
             gap: 13px;
-
             padding: 16px 0;
-
             border-bottom: 1px solid #f0f1f3;
+            text-decoration: none;
+            color: inherit;
         }
 
         .activity-item:last-child {
@@ -484,18 +415,13 @@
         .activity-icon {
             width: 34px;
             height: 34px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             flex-shrink: 0;
-
             border-radius: 8px;
-
             background: #f3f4f6;
-
-            font-size: 13px;
+            color: var(--text);
         }
 
         .activity-content {
@@ -506,21 +432,23 @@
         .activity-title {
             font-size: 13px;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .activity-description {
             margin-top: 3px;
-
             color: var(--muted);
-
             font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .activity-time {
             color: var(--light-muted);
-
             font-size: 11px;
-
             white-space: nowrap;
         }
 
@@ -536,22 +464,14 @@
             display: flex;
             align-items: center;
             gap: 13px;
-
             width: 100%;
-
             padding: 13px;
-
             margin-bottom: 8px;
-
             border: 1px solid transparent;
             border-radius: 9px;
-
             background: transparent;
-
             color: var(--text);
-
             text-decoration: none;
-
             transition: 0.2s ease;
         }
 
@@ -567,16 +487,12 @@
         .action-icon {
             width: 36px;
             height: 36px;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             border-radius: 9px;
-
             background: #f3f4f6;
-
-            font-size: 14px;
+            color: var(--text);
         }
 
         .action-content {
@@ -590,24 +506,146 @@
 
         .action-description {
             margin-top: 3px;
-
             color: var(--muted);
-
             font-size: 11px;
         }
 
         .action-arrow {
             color: var(--light-muted);
-
-            font-size: 16px;
+            display: flex;
+            align-items: center;
         }
 
         /* =========================
-           MOBILE
+           SUCCESS MODAL POPUP
+        ========================= */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(17, 24, 39, 0.4);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 420px;
+            padding: 32px 28px 24px;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                        0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            transform: scale(0.95);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--success-bg);
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .modal-description {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .modal-btn-primary {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--primary);
+            border: 1px solid var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .modal-btn-primary:hover {
+            background: #1f2937;
+        }
+
+        /* =========================
+           MOBILE & SIDEBAR TOGGLE
         ========================= */
 
         .mobile-header {
             display: none;
+        }
+
+        .mobile-user-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 17px;
+            transition: 0.2s ease;
+        }
+
+        .menu-toggle:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 99;
         }
 
         @media (max-width: 1100px) {
@@ -622,7 +660,19 @@
 
         @media (max-width: 768px) {
             .sidebar {
-                display: none;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .menu-toggle {
+                display: flex;
             }
 
             .main {
@@ -634,7 +684,6 @@
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-
                 margin-bottom: 30px;
             }
 
@@ -642,7 +691,6 @@
                 display: flex;
                 align-items: center;
                 gap: 10px;
-
                 font-size: 16px;
                 font-weight: 700;
             }
@@ -650,16 +698,12 @@
             .mobile-logo {
                 width: 36px;
                 height: 36px;
-
                 display: flex;
                 align-items: center;
                 justify-content: center;
-
                 border-radius: 9px;
-
                 background: var(--primary);
                 color: white;
-
                 font-size: 13px;
                 font-weight: 700;
             }
@@ -695,61 +739,65 @@
 
 <body>
 
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Success Modal Popup -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-card">
+            <div class="modal-icon-wrapper">
+                <i data-lucide="check-circle-2" style="width: 28px; height: 28px;"></i>
+            </div>
+
+            <h3 class="modal-title">Case Created Successfully!</h3>
+            <p class="modal-description" id="modalMessage">
+                Your new case has been created and assigned to your team members.
+            </p>
+
+            <button class="modal-btn-primary" onclick="closeSuccessModal()">
+                Got it
+            </button>
+        </div>
+    </div>
+
     <!-- Sidebar -->
-
-    <aside class="sidebar">
-
+    <aside class="sidebar" id="sidebar">
         <div class="brand">
-            <div class="brand-logo">
-                FC
-            </div>
-
-            <div class="brand-name">
-                Flex Cases
-            </div>
+            <div class="brand-logo">FC</div>
+            <div class="brand-name">Flex Cases</div>
         </div>
 
         <nav class="navigation">
+            <div class="nav-label">Menu</div>
 
-            <div class="nav-label">
-                Menu
-            </div>
-
-            <a href="#" class="nav-item active">
-                <span class="nav-icon">⌂</span>
+            <a href="{% url 'dashboard' %}" class="nav-item active">
+                <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
                 Dashboard
             </a>
 
-            <a href="#" class="nav-item">
-                <span class="nav-icon">▣</span>
+            <a href="{% url 'all-cases' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="briefcase"></i></span>
                 Cases
             </a>
 
-            <a href={% url 'create-case' %} class="nav-item">
-                <span class="nav-icon">+</span>
+            {% if person.person_type == 'manager' %}
+            <a href="{% url 'create-case' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="plus"></i></span>
                 Create a Case
             </a>
-
-            <a href="#" class="nav-item">
-                <span class="nav-icon">◷</span>
-                Activity
+            <a href="{% url 'add-employee' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="user-pen"></i></span>
+                Add Employee
             </a>
+            {% endif %}
 
-            <div class="nav-label" style="margin-top: 28px;">
-                Account
-            </div>
-
-            <a href="#" class="nav-item">
-                <span class="nav-icon">⚙</span>
-                Settings
+            <a href="{% url 'staff' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="user"></i></span>
+                Staff
             </a>
-
         </nav>
 
         <div class="sidebar-bottom">
-
             <div class="user-mini">
-
                 <div class="user-avatar">
                     {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
                 </div>
@@ -760,465 +808,259 @@
                     </div>
 
                     <div class="user-role">
-                        {% if request.user.is_superuser  %}
+                        {% if request.user.is_superuser %}
                             Admin
-                           
-                        {% elif person.person_type == "employee" %}    
+                        {% elif person.person_type == "employee" %}
                             Employee
-
                         {% elif person.person_type == "manager" %}
                             Manager
-                        
                         {% endif %}
-
                     </div>
                 </div>
-
             </div>
-
         </div>
-
     </aside>
 
-
     <!-- Main Content -->
-
     <main class="main">
-
-        <!-- Mobile header -->
-
         <div class="mobile-header">
-
             <div class="mobile-brand">
-
-                <div class="mobile-logo">
-                    FC
-                </div>
-
+                <button class="menu-toggle" id="menuToggle" aria-label="Open Menu">
+                    <i data-lucide="menu" class="small-icon"></i>
+                </button>
+                <div class="mobile-logo">FC</div>
                 Flex Cases
-
             </div>
 
-            <div class="user-avatar">
-                {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
-            </div>
+            <div class="mobile-user-actions">
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="notification" type="submit" aria-label="Logout">
+                        <i data-lucide="log-out" class="small-icon"></i>
+                    </button>
+                </form>
 
+                <div class="user-avatar">
+                    {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+                </div>
+            </div>
         </div>
 
-
         <!-- Top bar -->
-
         <div class="topbar">
-
             <div class="page-title">
-
                 <h1>Dashboard</h1>
-
-                <p>
-                    Overview of your workspace
-                </p>
-
+                <p>Overview of your workspace</p>
             </div>
 
             <div class="topbar-right">
-
                 <form method="POST" action="{% url 'logout' %}">
                     {% csrf_token %}
-
                     <button class="notification" type="submit">
                         <i data-lucide="log-out" class="small-icon"></i>
                     </button>
                 </form>
 
                 <div class="profile">
-
                     <div class="profile-avatar">
                         {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
                     </div>
-
                     <div class="profile-name">
                         {{ person.first_name }} {{ person.last_name }}
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
-
         <!-- Welcome -->
-
         <section class="welcome">
-
             <h2>
-                Welcome back{% if person.first_name %},
-                {{ person.first_name }}{% endif %}.
+                Welcome back{% if person.first_name %}, {{ person.first_name }}{% endif %}.
             </h2>
-
-            <p>
-                Here's what's happening with your workspace today.
-            </p>
-
+            <p>Here's what's happening with your workspace today.</p>
         </section>
-
 
         <!-- Statistics -->
-
         <section class="stats">
-
             <div class="stat-card">
-
                 <div class="stat-header">
-
-                    <span class="stat-title">
-                        Total Cases
-                    </span>
-
+                    <span class="stat-title">Total Cases</span>
                     <div class="stat-icon">
-                        ▣
+                        <i data-lucide="folder-open" class="small-icon"></i>
                     </div>
-
                 </div>
-
                 <div class="stat-value">
-                    {{ all_cases.count }}
+                    {{ all_cases.count|default:"0" }}
                 </div>
-
-                <div class="stat-change">
-                    Active cases
-                </div>
-
+                <div class="stat-change">Active cases</div>
             </div>
 
-
             <div class="stat-card">
-
                 <div class="stat-header">
-
-                    <span class="stat-title">
-                        Open Cases
-                    </span>
-
+                    <span class="stat-title">In Progress</span>
                     <div class="stat-icon">
-                        ◴
+                        <i data-lucide="clock" class="small-icon"></i>
                     </div>
-
                 </div>
-
                 <div class="stat-value">
-                    {{ working_cases.count }}
+                    {{ working_cases.count|default:"0" }}
                 </div>
-
-                <div class="stat-change">
-                    Currently being worked on
-                </div>
-
+                <div class="stat-change">Currently being worked on</div>
             </div>
 
-
             <div class="stat-card">
-
                 <div class="stat-header">
-
-                    <span class="stat-title">
-                        Completed
-                    </span>
-
+                    <span class="stat-title">Completed</span>
                     <div class="stat-icon">
-                        ✓
+                        <i data-lucide="check-circle" class="small-icon"></i>
                     </div>
-
                 </div>
-
                 <div class="stat-value">
-                    {{ completed_cases.count }}
+                    {{ completed_cases.count|default:"0" }}
                 </div>
-
-                <div class="stat-change">
-                    Cases completed
-                </div>
-
+                <div class="stat-change">Cases completed</div>
             </div>
 
-
             <div class="stat-card">
-
                 <div class="stat-header">
-
-                    <span class="stat-title">
-                        Team Members
-                    </span>
-
+                    <span class="stat-title">Team Members</span>
                     <div class="stat-icon">
-                        ◉
+                        <i data-lucide="users" class="small-icon"></i>
                     </div>
-
                 </div>
-
                 <div class="stat-value">
-                    {{ employees.count }}
+                    {{ employees.count|default:"0" }}
                 </div>
-
-                <div class="stat-change">
-                    Employee count
-                </div>
-
+                <div class="stat-change">Employee count</div>
             </div>
-
         </section>
 
-
-        <!-- Bottom content -->
-
+        <!-- Content Grid -->
         <section class="content-grid">
-
-
-            <!-- Recent activity -->
-
+            <!-- Recent Cases -->
             <div class="card">
-
                 <div class="card-header">
-
-                    <h3>
-                        Recent Activity
-                    </h3>
-
-                    <a href="#">
-                        View all
-                    </a>
-
+                    <h3>Recent Cases</h3>
+                    <a href="{% url 'all-cases' %}">View all</a>
                 </div>
 
                 <div class="activity">
-
-                    <div class="activity-item">
-
+                    {% for case in all_cases|slice:":5" %}
+                    <a href="{% url 'case-detail' case.id %}" class="activity-item">
                         <div class="activity-icon">
-                            +
+                            {% if case.status == 'completed' %}
+                                <i data-lucide="check-circle-2" class="small-icon" style="color: var(--success);"></i>
+                            {% elif case.status == 'working' %}
+                                <i data-lucide="clock" class="small-icon"></i>
+                            {% else %}
+                                <i data-lucide="circle" class="small-icon"></i>
+                            {% endif %}
                         </div>
 
                         <div class="activity-content">
-
-                            <div class="activity-title">
-                                New case created
-                            </div>
-
+                            <div class="activity-title">{{ case.name }}</div>
                             <div class="activity-description">
-                                Case #FC-1024 was created
+                                {% if case.description %}{{ case.description|striptags }}{% else %}No description provided.{% endif %}
                             </div>
-
                         </div>
 
                         <div class="activity-time">
-                            10 min ago
+                            {{ case.created_at|date:"M d" }}
                         </div>
-
+                    </a>
+                    {% empty %}
+                    <div style="padding: 24px; text-align: center; color: var(--muted); font-size: 13px;">
+                        No cases found.
                     </div>
-
-
-                    <div class="activity-item">
-
-                        <div class="activity-icon">
-                            ✓
-                        </div>
-
-                        <div class="activity-content">
-
-                            <div class="activity-title">
-                                Task completed
-                            </div>
-
-                            <div class="activity-description">
-                                Review case documentation
-                            </div>
-
-                        </div>
-
-                        <div class="activity-time">
-                            1 hour ago
-                        </div>
-
-                    </div>
-
-
-                    <div class="activity-item">
-
-                        <div class="activity-icon">
-                            ◉
-                        </div>
-
-                        <div class="activity-content">
-
-                            <div class="activity-title">
-                                Case assigned
-                            </div>
-
-                            <div class="activity-description">
-                                Case #FC-1021 assigned to your team
-                            </div>
-
-                        </div>
-
-                        <div class="activity-time">
-                            3 hours ago
-                        </div>
-
-                    </div>
-
-
-                    <div class="activity-item">
-
-                        <div class="activity-icon">
-                            ↻
-                        </div>
-
-                        <div class="activity-content">
-
-                            <div class="activity-title">
-                                Case updated
-                            </div>
-
-                            <div class="activity-description">
-                                Case #FC-1018 information was updated
-                            </div>
-
-                        </div>
-
-                        <div class="activity-time">
-                            Yesterday
-                        </div>
-
-                    </div>
-
+                    {% endfor %}
                 </div>
-
             </div>
 
-
-            <!-- Quick actions -->
-
+            <!-- Quick Actions -->
             <div class="card">
-
                 <div class="card-header">
-
-                    <h3>
-                        Quick Actions
-                    </h3>
-
+                    <h3>Quick Actions</h3>
                 </div>
 
                 <div class="actions">
-
-                    <a href="#" class="action">
-
+                    {% if person.person_type == 'manager' %}
+                    <a href="{% url 'create-case' %}" class="action">
                         <div class="action-icon">
-                            +
+                            <i data-lucide="plus" class="small-icon"></i>
                         </div>
-
                         <div class="action-content">
-
-                            <div class="action-title">
-                                Create a case
-                            </div>
-
-                            <div class="action-description">
-                                Start a new case
-                            </div>
-
+                            <div class="action-title">Create a case</div>
+                            <div class="action-description">Start a new case</div>
                         </div>
-
                         <div class="action-arrow">
-                            →
+                            <i data-lucide="arrow-right" class="small-icon"></i>
                         </div>
+                    </a>
+                    {% endif %}
 
+                    <a href="{% url 'all-cases' %}" class="action">
+                        <div class="action-icon">
+                            <i data-lucide="briefcase" class="small-icon"></i>
+                        </div>
+                        <div class="action-content">
+                            <div class="action-title">View all cases</div>
+                            <div class="action-description">Browse and filter cases</div>
+                        </div>
+                        <div class="action-arrow">
+                            <i data-lucide="arrow-right" class="small-icon"></i>
+                        </div>
                     </a>
 
-
-                    <a href="#" class="action">
-
+                    <a href="{% url 'staff' %}" class="action">
                         <div class="action-icon">
-                            ✓
+                            <i data-lucide="users" class="small-icon"></i>
                         </div>
-
                         <div class="action-content">
-
-                            <div class="action-title">
-                                View tasks
-                            </div>
-
-                            <div class="action-description">
-                                Check your pending tasks
-                            </div>
-
+                            <div class="action-title">Team members</div>
+                            <div class="action-description">View your team</div>
                         </div>
-
                         <div class="action-arrow">
-                            →
+                            <i data-lucide="arrow-right" class="small-icon"></i>
                         </div>
-
                     </a>
-
-
-                    <a href="#" class="action">
-
-                        <div class="action-icon">
-                            ◉
-                        </div>
-
-                        <div class="action-content">
-
-                            <div class="action-title">
-                                Team members
-                            </div>
-
-                            <div class="action-description">
-                                View your team
-                            </div>
-
-                        </div>
-
-                        <div class="action-arrow">
-                            →
-                        </div>
-
-                    </a>
-
-
-                    <a href="#" class="action">
-
-                        <div class="action-icon">
-                            ⚙
-                        </div>
-
-                        <div class="action-content">
-
-                            <div class="action-title">
-                                Settings
-                            </div>
-
-                            <div class="action-description">
-                                Manage your account
-                            </div>
-
-                        </div>
-
-                        <div class="action-arrow">
-                            →
-                        </div>
-
-                    </a>
-
                 </div>
-
             </div>
-
         </section>
-
     </main>
 
     <script>
         lucide.createIcons();
+
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const successModal = document.getElementById('successModal');
+        const modalMessage = document.getElementById('modalMessage');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+        }
+
+        if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        function openSuccessModal(message) {
+            if (message) modalMessage.textContent = message;
+            successModal.classList.add('active');
+        }
+
+        function closeSuccessModal() {
+            successModal.classList.remove('active');
+        }
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if 'case_created' in message.extra_tags %}
+                    openSuccessModal("{{ message|escapejs }}");
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </script>
 </body>
 </html>

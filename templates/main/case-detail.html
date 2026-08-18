@@ -1,0 +1,1342 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ case.name }} | Flex Cases</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f5f7fb;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --muted: #6b7280;
+            --light-muted: #9ca3af;
+            --primary: #111827;
+            --hover: #f3f4f6;
+            --sidebar-width: 250px;
+
+            /* Status & Badge Colors */
+            --status-not-started-bg: #f3f4f6;
+            --status-not-started-text: #4b5563;
+            --status-working-bg: #eff6ff;
+            --status-working-text: #1d4ed8;
+            --status-completed-bg: #ecfdf5;
+            --status-completed-text: #047857;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                         Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .small-icon {
+            width: 15px;
+            height: 15px;
+        }
+
+        /* Danger Buttons */
+        .btn-danger-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-danger-outline:hover {
+            background: #fee2e2;
+            border-color: #f87171;
+        }
+
+        .btn-danger {
+            padding: 9px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #dc2626;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        /* Delete Confirmation Modal */
+        .delete-modal-container {
+            max-width: 400px;
+            padding: 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .delete-icon-wrapper {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #fef2f2;
+            border: 8px solid #fff5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #dc2626;
+            margin-bottom: 16px;
+        }
+
+        .delete-warning-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .delete-modal-content h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .delete-modal-content p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .delete-modal-actions {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .delete-modal-actions button {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px;
+            margin-bottom: 36px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            border-radius: 11px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .brand-name {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .navigation {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-label {
+            padding: 0 12px;
+            margin-bottom: 8px;
+            color: var(--light-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 12px;
+            border-radius: 9px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: #f0f1f3;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+        }
+
+        .user-mini {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .user-info {
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 99;
+        }
+
+        .main {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            padding: 28px 36px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .page-title p {
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .notification:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 10px 5px 5px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface);
+        }
+
+        .profile-avatar {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .profile-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Back Button Navigation */
+        .back-nav {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            transition: color 0.2s ease;
+        }
+
+        .back-nav:hover {
+            color: var(--text);
+        }
+
+        /* Detail Page Layout */
+        .detail-header-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .detail-header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .detail-header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .detail-header-title h2 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-not-started {
+            background: var(--status-not-started-bg);
+            color: var(--status-not-started-text);
+        }
+
+        .badge-working {
+            background: var(--status-working-bg);
+            color: var(--status-working-text);
+        }
+
+        .badge-completed {
+            background: var(--status-completed-bg);
+            color: var(--status-completed-text);
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .btn-edit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .btn-edit:hover {
+            background: #1f2937;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .detail-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .detail-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .case-description-body {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .case-description-body ul,
+        .case-description-body ol {
+            padding-left: 20px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--light-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .assignees-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .assignee-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .assignee-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .assignee-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* CKEditor Integration */
+        .ck-editor__editable_inline {
+            min-height: 180px;
+            padding-left: 28px !important;
+            padding-right: 20px !important;
+        }
+
+        .ck-content ul,
+        .ck-content ol {
+            padding-left: 20px !important;
+            margin-left: 0 !important;
+        }
+
+        .ck.ck-editor {
+            border-radius: 9px !important;
+            overflow: hidden;
+        }
+
+        .ck.ck-toolbar {
+            border-color: var(--border) !important;
+            background: #fafafa !important;
+        }
+
+        .ck.ck-content {
+            border-color: var(--border) !important;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-container {
+            background: var(--surface);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .modal-close:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+
+        .modal-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #9ca3af;
+        }
+
+        /* Custom Employee Selector */
+        .employee-selector-box {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface);
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .employee-selector-box:focus-within {
+            border-color: #9ca3af;
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
+        }
+
+        .employee-search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            background: #fafafa;
+        }
+
+        .employee-search-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .employee-search-input::placeholder {
+            color: var(--light-muted);
+        }
+
+        .employee-list {
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .employee-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s ease;
+        }
+
+        .employee-option:hover {
+            background: var(--hover);
+        }
+
+        .employee-checkbox {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .emp-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .emp-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .selected-badge {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 12px;
+            text-transform: none;
+        }
+
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #fafafa;
+        }
+
+        .btn-secondary {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover);
+        }
+
+        .btn-primary {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #1f2937;
+        }
+
+        .mobile-header {
+            display: none;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        @media (max-width: 900px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 30px;
+            }
+
+            .mobile-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .mobile-logo {
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 9px;
+                background: var(--primary);
+                color: white;
+                font-size: 13px;
+                font-weight: 700;
+            }
+
+            .topbar {
+                margin-bottom: 24px;
+            }
+
+            .topbar-right {
+                display: none;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .main {
+                padding: 16px;
+            }
+
+            .page-title h1 {
+                font-size: 21px;
+            }
+
+            .detail-header-card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-logo">FC</div>
+            <div class="brand-name">Flex Cases</div>
+        </div>
+
+        <nav class="navigation">
+            <div class="nav-label">Menu</div>
+            <a href="{% url 'dashboard' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+                Dashboard
+            </a>
+            <a href="{% url 'all-cases' %}" class="nav-item active">
+                <span class="nav-icon"><i data-lucide="briefcase"></i></span>
+                Cases
+            </a>
+            {% if person.person_type == 'manager' %}
+            <a href="{% url 'create-case' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="plus"></i></span>
+                Create a Case
+            </a>
+            <a href="{% url 'add-employee' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="user-pen"></i></span>
+                Add Employee
+            </a>
+            {% endif %}
+            <a href="{% url 'staff' %}" class="nav-item">
+                <span class="nav-icon"><i data-lucide="user"></i></span>
+                Staff
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="user-mini">
+                <div class="user-avatar">
+                    {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">{{ person.first_name }} {{ person.last_name }}</div>
+                    <div class="user-role">
+                        {% if request.user.is_superuser %} Admin
+                        {% elif person.person_type == "employee" %} Employee
+                        {% elif person.person_type == "manager" %} Manager
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="mobile-header">
+            <div class="mobile-brand">
+                <button class="menu-toggle" id="menuToggle" aria-label="Open Menu">
+                    <i data-lucide="menu" class="small-icon"></i>
+                </button>
+                <div class="mobile-logo">FC</div>
+                Flex Cases
+            </div>
+            <div class="user-avatar">
+                {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+            </div>
+        </div>
+
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Case Details</h1>
+                <p>View detailed information regarding this case</p>
+            </div>
+
+            <div class="topbar-right">
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="notification" type="submit" aria-label="Logout">
+                        <i data-lucide="log-out" class="small-icon"></i>
+                    </button>
+                </form>
+
+                <div class="profile">
+                    <div class="profile-avatar">
+                        {{ person.first_name|slice:":1"|upper }}{{ person.last_name|slice:":1"|upper }}
+                    </div>
+                    <div class="profile-name">
+                        {{ person.first_name }} {{ person.last_name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="{% url 'all-cases' %}" class="back-nav">
+            <i data-lucide="arrow-left" class="small-icon"></i> Back to All Cases
+        </a>
+
+        <!-- Main Header Banner -->
+        <div class="detail-header-card">
+            <div class="detail-header-left">
+                <div class="detail-header-title">
+                    <h2>{{ case.name }}</h2>
+                    {% if case.status == 'completed' %}
+                        <span class="badge badge-completed"><span class="badge-dot"></span>Completed</span>
+                    {% elif case.status == 'working' %}
+                        <span class="badge badge-working"><span class="badge-dot"></span>Working</span>
+                    {% else %}
+                        <span class="badge badge-not-started"><span class="badge-dot"></span>Not Started</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button type="button" class="btn-edit" id="openEditModalBtn">
+                <i data-lucide="edit-3" class="small-icon"></i> Edit Case
+            </button>
+        </div>
+
+        <!-- Detail Content Grid -->
+        <div class="detail-grid">
+            <!-- Left Column: Description -->
+            <div class="detail-card">
+                <div class="detail-card-title">
+                    <i data-lucide="file-text" class="small-icon"></i>
+                    Description
+                </div>
+                <div class="case-description-body">
+                    {% if case.description %}
+                        {{ case.description|safe }}
+                    {% else %}
+                        <p style="color: var(--muted); font-style: italic;">No description provided for this case.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column: Case Meta Info -->
+            <div class="detail-card">
+                <div class="detail-card-title">
+                    <i data-lucide="info" class="small-icon"></i>
+                    Case Overview
+                </div>
+
+                <div class="sidebar-info-group">
+                    <div class="info-item">
+                        <span class="info-label">Assigned To</span>
+                        <div class="assignees-stack">
+                            {% if case.assigned_to.all %}
+                                {% for emp in case.assigned_to.all %}
+                                <div class="assignee-row">
+                                    <div class="assignee-avatar">
+                                        {{ emp.first_name|slice:":1"|upper }}{{ emp.last_name|slice:":1"|upper }}
+                                    </div>
+                                    <span class="assignee-name">{{ emp.first_name }} {{ emp.last_name }}</span>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <span style="color: var(--light-muted); font-size: 13px;">No one assigned</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Created At</span>
+                        <span class="info-value">{{ case.created_at|date:"H:i, M d, Y"|default:"Recently" }}</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Last Updated</span>
+                        <span class="info-value">
+                            {% if case.updated_at %}
+                                {{ case.updated_at|short_timesince }}
+                            {% else %}
+                                Recently
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Update / Delete Case Modal -->
+    <div class="modal-overlay" id="caseModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Update Case</h3>
+                <button class="modal-close" id="modalCloseBtn"><i data-lucide="x" class="small-icon"></i></button>
+            </div>
+            
+            <form id="updateCaseForm" method="POST" action="{% url 'update-case' case.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Edit Name -->
+                    <div class="form-group">
+                        <label for="modalCaseName">Case Name</label>
+                        <input type="text" name="name" id="modalCaseName" class="form-control" value="{{ case.name }}" required>
+                    </div>
+
+                    <!-- Edit Description -->
+                    <div class="form-group">
+                        <label for="modalCaseDescInput">Description</label>
+                        <textarea name="description" id="modalCaseDescInput" class="form-control" rows="3">{{ case.description|default:'' }}</textarea>
+                    </div>
+
+                    <!-- Edit Status -->
+                    <div class="form-group">
+                        <label for="modalStatus">Status</label>
+                        <select name="status" id="modalStatus" class="form-control">
+                            <option value="not_started" {% if case.status == 'not_started' %}selected{% endif %}>Not Started</option>
+                            <option value="working" {% if case.status == 'working' %}selected{% endif %}>Working</option>
+                            <option value="completed" {% if case.status == 'completed' %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+
+                    <!-- Assigned Employees -->
+                    <div class="form-group">
+                        <div class="form-label-header">
+                            <label>Assigned Employees</label>
+                            <span class="selected-badge" id="selectedCount">0 selected</span>
+                        </div>
+
+                        <div class="employee-selector-box">
+                            <div class="employee-search-bar">
+                                <i data-lucide="search" class="small-icon" style="color: var(--light-muted);"></i>
+                                <input 
+                                    type="text" 
+                                    class="employee-search-input" 
+                                    id="employeeSearch" 
+                                    placeholder="Search team members..."
+                                >
+                            </div>
+
+                            <div class="employee-list" id="employeeList">
+                                {% for emp in employees %}
+                                <label class="employee-option" data-name="{{ emp.first_name|lower }} {{ emp.last_name|lower }}">
+                                    <input 
+                                        type="checkbox" 
+                                        name="assigned_to" 
+                                        value="{{ emp.id }}" 
+                                        class="employee-checkbox"
+                                        {% if emp in case.assigned_to.all %}checked{% endif %}
+                                    >
+                                    <div class="emp-avatar">
+                                        {{ emp.first_name|slice:":1"|upper }}{{ emp.last_name|slice:":1"|upper }}
+                                    </div>
+                                    <span class="emp-name">{{ emp.first_name }} {{ emp.last_name }}</span>
+                                </label>
+                                {% empty %}
+                                <div style="padding: 12px; text-align: center; color: var(--muted); font-size: 12px;">
+                                    No employees found.
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="justify-content: space-between;">
+                    {% if person.person_type == 'manager' %}
+                    <button type="button" class="btn-danger-outline" id="modalDeleteTrigger">
+                        <i data-lucide="trash-2" class="small-icon"></i> Delete Case
+                    </button>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+                    
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn-secondary" id="modalCancelBtn">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteConfirmModal" style="z-index: 1100;">
+        <div class="modal-container delete-modal-container">
+            <div class="delete-icon-wrapper">
+                <i data-lucide="alert-triangle" class="delete-warning-icon"></i>
+            </div>
+            <div class="delete-modal-content">
+                <h3>Delete Case</h3>
+                <p>Are you sure you want to delete <strong>"{{ case.name }}"</strong>? This action cannot be undone and all associated data will be removed.</p>
+            </div>
+            <div class="delete-modal-actions">
+                <button type="button" class="btn-secondary" id="cancelDeleteBtn">Cancel</button>
+                <button type="button" class="btn-danger" id="confirmDeleteBtn">Yes, Delete Case</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Form for Deleting Case -->
+    <form id="deleteCaseForm" method="POST" action="{% url 'delete-case' case.id %}" style="display: none;">
+        {% csrf_token %}
+    </form>
+
+    <script>
+        lucide.createIcons();
+
+        // Modals & Elements
+        const caseModal = document.getElementById('caseModal');
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        const openEditModalBtn = document.getElementById('openEditModalBtn');
+        
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        const modalDeleteTrigger = document.getElementById('modalDeleteTrigger');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const deleteCaseForm = document.getElementById('deleteCaseForm');
+
+        const employeeSearch = document.getElementById('employeeSearch');
+        const employeeOptions = document.querySelectorAll('.employee-option');
+        const employeeCheckboxes = document.querySelectorAll('.employee-checkbox');
+        const selectedCount = document.getElementById('selectedCount');
+
+        let editorInstance = null;
+
+        // Initialize CKEditor on modal description field
+        const modalCaseDescInput = document.getElementById('modalCaseDescInput');
+        if (modalCaseDescInput) {
+            ClassicEditor
+                .create(modalCaseDescInput)
+                .then(editor => {
+                    editorInstance = editor;
+                })
+                .catch(error => {
+                    console.error('CKEditor initialization error:', error);
+                });
+        }
+
+        function updateSelectedCount() {
+            const count = document.querySelectorAll('.employee-checkbox:checked').length;
+            selectedCount.textContent = `${count} selected`;
+        }
+
+        // Initialize count on page load
+        updateSelectedCount();
+
+        if (employeeSearch) {
+            employeeSearch.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                employeeOptions.forEach(option => {
+                    const name = option.dataset.name;
+                    option.style.display = name.includes(query) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        employeeCheckboxes.forEach(cb => {
+            cb.addEventListener('change', updateSelectedCount);
+        });
+
+        function openModal() {
+            caseModal.classList.add('active');
+        }
+
+        function closeModal() {
+            caseModal.classList.remove('active');
+        }
+
+        function openDeleteModal() {
+            deleteConfirmModal.classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            deleteConfirmModal.classList.remove('active');
+        }
+
+        if (openEditModalBtn) {
+            openEditModalBtn.addEventListener('click', openModal);
+        }
+
+        if (modalDeleteTrigger) {
+            modalDeleteTrigger.addEventListener('click', openDeleteModal);
+        }
+
+        if (cancelDeleteBtn) {
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+        }
+
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', () => {
+                deleteCaseForm.submit();
+            });
+        }
+
+        if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+        if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === caseModal) closeModal();
+            if (e.target === deleteConfirmModal) closeDeleteModal();
+        });
+
+        // Mobile Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        if (menuToggle && sidebar && sidebarOverlay) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('active');
+            });
+
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+    </script>
+</body>
+</html>
