@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+import os
 
 
 def root_redirect(request):
@@ -27,7 +28,7 @@ def root_redirect(request):
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(os.getenv("ADMIN_URL"), admin.site.urls),
     path("", root_redirect, name="root"),
     path('user/', include('user.urls')),
     path('', include('main.urls')),
