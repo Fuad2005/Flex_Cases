@@ -3,10 +3,85 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Case, Value, IntegerField, When
+# from django.http import HttpResponse, JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
 from . import models
 from user import models as user_models
 
 # Create your views here.
+
+# Set these in your settings.py or environment variables
+# VERIFY_TOKEN = "my_custom_webhook_token"
+# PHONE_NUMBER_ID = "YOUR_META_PHONE_NUMBER_ID"
+# ACCESS_TOKEN = "YOUR_META_ACCESS_TOKEN"
+
+# @csrf_exempt
+# def whatsapp_webhook(request):
+#     # 1. Meta Webhook Verification (GET Request)
+#     if request.method == "GET":
+#         mode = request.GET.get("hub.mode")
+#         token = request.GET.get("hub.verify_token")
+#         challenge = request.GET.get("hub.challenge")
+
+#         if mode == "subscribe" and token == VERIFY_TOKEN:
+#             return HttpResponse(challenge, status=200)
+#         return HttpResponse("Verification failed", status=403)
+
+#     # 2. Receive Incoming WhatsApp Messages (POST Request)
+#     elif request.method == "POST":
+#         try:
+#             data = json.loads(request.body.decode("utf-8"))
+#             entry = data["entry"][0]["changes"][0]["value"]
+
+#             if "messages" in entry:
+#                 message_data = entry["messages"][0]
+#                 sender_phone = message_data["from"]  # Customer's WhatsApp number
+                
+#                 # Extract text body (or fallback for media)
+#                 if message_data.get("type") == "text":
+#                     message_text = message_data["text"]["body"]
+#                 else:
+#                     message_text = f"Received non-text message type: {message_data.get('type')}"
+
+#                 # Customer name from WhatsApp profile if available
+#                 contacts = entry.get("contacts", [])
+#                 customer_name = contacts[0]["profile"]["name"] if contacts else f"WhatsApp ({sender_phone})"
+
+#                 # --- Create the Case in your Database ---
+#                 case_name = f"WhatsApp Case: {customer_name}"
+#                 case_description = f"From: {sender_phone}\nMessage: {message_text}"
+
+#                 new_case = models.Case.objects.create(
+#                     name=case_name,
+#                     description=case_description,
+#                     status="not_started"
+#                 )
+
+#                 # Optional: Send an automated reply back to the customer
+#                 send_whatsapp_reply(
+#                     sender_phone, 
+#                     f"Hello {customer_name}! Your case #{new_case.id} has been created. A team member will reach out soon."
+#                 )
+
+#         except Exception as e:
+#             # Return 200 to Meta even if processing fails so they don't resend the webhook repeatedly
+#             print(f"Error processing WhatsApp message: {e}")
+
+#         return JsonResponse({"status": "success"}, status=200)
+
+# def send_whatsapp_reply(recipient_number, message_text):
+#     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+#     headers = {
+#         "Authorization": f"Bearer {ACCESS_TOKEN}",
+#         "Content-Type": "application/json",
+#     }
+#     payload = {
+#         "messaging_product": "whatsapp",
+#         "to": recipient_number,
+#         "type": "text",
+#         "text": {"body": message_text},
+#     }
+#     requests.post(url, json=payload, headers=headers)
 
 
 # Dashboard

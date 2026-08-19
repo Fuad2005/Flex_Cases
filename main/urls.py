@@ -9,4 +9,5 @@ urlpatterns = [
     path('case/<int:case_id>/update/', views.update_case, name='update-case'),
     path('case/<int:case_id>/delete/', views.delete_case, name='delete-case'),
     path('staff/', views.staff, name='staff'),
+    # path('webhook/whatsapp/', views.whatsapp_webhook, name='whatsapp-webhook'),
 ]
