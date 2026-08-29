@@ -1038,9 +1038,24 @@
                 </div>
             </div>
 
-            <button type="button" class="btn-edit" id="openEditModalBtn">
-                <i data-lucide="edit-3" class="small-icon"></i> Edit Case
-            </button>
+            {% if person.person_type == 'manager' %}
+                <button type="button" class="btn-edit" id="openEditModalBtn">
+                    <i data-lucide="edit-3" class="small-icon"></i> Edit Case
+                </button>
+            {% elif person.person_type == 'employee' %}
+                {% if person in case.assigned_to.all %}
+                    <button type="button" class="btn-secondary" disabled style="opacity: 0.7; cursor: not-allowed;">
+                        <i data-lucide="check" class="small-icon"></i> Assigned to You
+                    </button>
+                {% else %}
+                    <form method="POST" action="{% url 'update-case' case.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-edit">
+                            <i data-lucide="user-plus" class="small-icon"></i> Take Case
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
         </div>
 
         <!-- Detail Content Grid -->

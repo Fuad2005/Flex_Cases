@@ -3,85 +3,118 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Case, Value, IntegerField, When
-# from django.http import HttpResponse, JsonResponse
-# from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from . import models
+# from .utils import send_whatsapp_message
 from user import models as user_models
+import os
+import json
 
 # Create your views here.
 
-# Set these in your settings.py or environment variables
-# VERIFY_TOKEN = "my_custom_webhook_token"
-# PHONE_NUMBER_ID = "YOUR_META_PHONE_NUMBER_ID"
-# ACCESS_TOKEN = "YOUR_META_ACCESS_TOKEN"
 
 # @csrf_exempt
 # def whatsapp_webhook(request):
-#     # 1. Meta Webhook Verification (GET Request)
-#     if request.method == "GET":
-#         mode = request.GET.get("hub.mode")
-#         token = request.GET.get("hub.verify_token")
-#         challenge = request.GET.get("hub.challenge")
 
-#         if mode == "subscribe" and token == VERIFY_TOKEN:
+#     print("\n========== WHATSAPP WEBHOOK ==========")
+#     print("METHOD:", request.method)
+#     print("PATH:", request.path)
+#     print("BODY:", request.body.decode("utf-8"))
+#     print("======================================\n")
+
+#     # 1. VERIFICATION HANDSHAKE (GET)
+#     if request.method == 'GET':
+#         mode = request.GET.get('hub.mode')
+#         token = request.GET.get('hub.verify_token')
+#         challenge = request.GET.get('hub.challenge')
+
+#         if mode == 'subscribe' and token == VERIFY_TOKEN:
 #             return HttpResponse(challenge, status=200)
-#         return HttpResponse("Verification failed", status=403)
+#         return HttpResponse('Verification failed', status=403)
 
-#     # 2. Receive Incoming WhatsApp Messages (POST Request)
-#     elif request.method == "POST":
+#     # 2. INCOMING MESSAGES & AUTOMATED REPLIES (POST)
+#     elif request.method == 'POST':
 #         try:
-#             data = json.loads(request.body.decode("utf-8"))
-#             entry = data["entry"][0]["changes"][0]["value"]
+#             data = json.loads(request.body.decode('utf-8'))
 
-#             if "messages" in entry:
-#                 message_data = entry["messages"][0]
-#                 sender_phone = message_data["from"]  # Customer's WhatsApp number
-                
-#                 # Extract text body (or fallback for media)
-#                 if message_data.get("type") == "text":
-#                     message_text = message_data["text"]["body"]
-#                 else:
-#                     message_text = f"Received non-text message type: {message_data.get('type')}"
+#             entries = data.get('entry', [])
+#             for entry in entries:
+#                 changes = entry.get('changes', [])
+#                 for change in changes:
+#                     value = change.get('value', {})
+#                     messages = value.get('messages', [])
 
-#                 # Customer name from WhatsApp profile if available
-#                 contacts = entry.get("contacts", [])
-#                 customer_name = contacts[0]["profile"]["name"] if contacts else f"WhatsApp ({sender_phone})"
+#                     if messages:
+#                         message = messages[0]
+#                         sender_phone = message.get('from')  # Sender's phone number (e.g. 994702148626)
+                        
+#                         # Check if it's a standard text message
+#                         if message.get('type') == 'text':
+#                             message_body = message.get('text', {}).get('body', '')
 
-#                 # --- Create the Case in your Database ---
-#                 case_name = f"WhatsApp Case: {customer_name}"
-#                 case_description = f"From: {sender_phone}\nMessage: {message_text}"
+#                             # Log the incoming message to your Django console
+#                             print(f"\n[RECEIVED] Message from {sender_phone}: '{message_body}'\n")
 
-#                 new_case = models.Case.objects.create(
-#                     name=case_name,
-#                     description=case_description,
-#                     status="not_started"
-#                 )
+#                             # Build your automated reply text
+#                             reply_text = f"🤖 Automated Reply: We received your message ('{message_body}')."
 
-#                 # Optional: Send an automated reply back to the customer
-#                 send_whatsapp_reply(
-#                     sender_phone, 
-#                     f"Hello {customer_name}! Your case #{new_case.id} has been created. A team member will reach out soon."
-#                 )
+#                             # Send the automated reply back via Meta's Graph API
+#                             api_response = send_whatsapp_message(sender_phone, reply_text)
+#                             print(f"[SENT] API Response: {api_response}\n")
 
 #         except Exception as e:
-#             # Return 200 to Meta even if processing fails so they don't resend the webhook repeatedly
-#             print(f"Error processing WhatsApp message: {e}")
+#             print(f"Webhook processing error: {e}")
 
-#         return JsonResponse({"status": "success"}, status=200)
+#         # Meta requires a fast 200 OK HTTP response
+#         return HttpResponse('EVENT_RECEIVED', status=200)
 
-# def send_whatsapp_reply(recipient_number, message_text):
-#     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
-#     headers = {
-#         "Authorization": f"Bearer {ACCESS_TOKEN}",
-#         "Content-Type": "application/json",
-#     }
-#     payload = {
-#         "messaging_product": "whatsapp",
-#         "to": recipient_number,
-#         "type": "text",
-#         "text": {"body": message_text},
-#     }
-#     requests.post(url, json=payload, headers=headers)
+
+@csrf_exempt
+def google_form_webhook(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            
+            # Extract variables
+            user_email = data.get('user_email')
+            full_name = data.get('Adınız və soyadınız', 'Unknown')
+            phone_number = data.get('Əlaqə nömrəniz', 'N/A')
+            location_info = data.get('Layihə və ya problemin baş verdiyi məkan haqqında', 'N/A')
+            
+            category = data.get('Sorğunuz nə ilə bağlıdır::') or data.get('Sorğunuz nə ilə bağlıdır:', 'N/A')
+            description_text = data.get('Problem haqqında qısa məlumat::') or data.get('Problem haqqında qısa məlumat:', 'N/A')
+            description_text_html = description_text.replace('\n', '<br>')
+
+            # Format Name and Description
+            case_name = f"Case from {full_name}"
+            
+            case_description = f"""
+<p><strong>👤 Name:</strong> {full_name}</p>
+<p><strong>📧 Email:</strong> {user_email}</p>
+<p><strong>📞 Phone:</strong> {phone_number}</p>
+<p><strong>📍 Location/Project:</strong> {location_info}</p>
+<p><strong>🏷️ Category:</strong> {category}</p>
+<p><strong>📝 Description:</strong> </br>{description_text_html}</p>
+            """.strip()
+
+            # Create Case model instance
+            new_case = models.Case.objects.create(
+                name=case_name,
+                description=case_description,
+            )
+
+            print(f"\n✅ Case #{new_case.id} successfully created: '{new_case.name}'\n")
+
+            return JsonResponse({'status': 'success', 'case_id': new_case.id}, status=201)
+
+        except Exception as e:
+            print(f"Error saving case: {e}")
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+            
+    return JsonResponse({'status': 'method not allowed'}, status=405)
+
+
 
 
 # Dashboard
@@ -230,8 +263,18 @@ def all_cases(request):
 def update_case(request, case_id):
     if request.method == "POST":
         case = get_object_or_404(models.Case, id=case_id)
-        
-        # Update Name & Description
+        person = get_object_or_404(user_models.Person, user=request.user)
+
+        # Employee Logic: Only add the current employee to assigned_to
+        if person.person_type == "employee":
+            case.assigned_to.add(person)
+            if case.status == "not_started":
+                case.status = "working"
+            case.save()
+            messages.success(request, "You have taken this case!")
+            return redirect(request.META.get('HTTP_REFERER', 'all-cases'))
+
+        # Manager Logic: Full update
         name = request.POST.get("name")
         description = request.POST.get("description")
         
@@ -241,21 +284,18 @@ def update_case(request, case_id):
         if description is not None:
             case.description = description.strip()
 
-        # Update status
         new_status = request.POST.get("status")
         if new_status in ["not_started", "working", "completed"]:
             case.status = new_status
 
         case.save()
 
-        # Update assigned employees
         assigned_to_ids = request.POST.getlist("assigned_to")
         case.assigned_to.set(assigned_to_ids)
 
         messages.success(request, "Case updated successfully!")
         
     return redirect(request.META.get('HTTP_REFERER', 'all-cases'))
-
 
 @login_required
 def delete_case(request, case_id):
@@ -309,3 +349,12 @@ def staff(request):
     }
 
     return render(request, "main/staff.html", context)
+
+
+
+
+# ================================================================
+
+
+def privacy(request):
+    return render(request, "main/privacy-policy.html")
