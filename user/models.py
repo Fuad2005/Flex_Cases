@@ -13,6 +13,7 @@ class Person(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     person_type = models.CharField(max_length=10, choices=PersonType.choices)
+    email = models.EmailField(blank=True, null=True)
 
 
     def __str__(self):

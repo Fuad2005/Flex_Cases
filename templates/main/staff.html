@@ -740,14 +740,14 @@
 
                     <div class="staff-details">
                         <h3>{{ manager.first_name }} {{ manager.last_name }}</h3>
-                        {% comment %} <p>{{ manager.user.email|default:"No email provided" }}</p> {% endcomment %}
+                        <p>{{ manager.email|default:"No email provided" }}</p>
                     </div>
                 </div>
 
-                <div class="staff-stats">
+                {% comment %} <div class="staff-stats">
                     <span>Active Cases</span>
                     <strong>{{ manager.cases.count|default:"0" }}</strong>
-                </div>
+                </div> {% endcomment %}
             </div>
             {% empty %}
             <div class="empty-section" style="grid-column: 1 / -1;">
@@ -782,7 +782,7 @@
 
                             <div class="staff-details">
                                 <h3>{{ employee.first_name }} {{ employee.last_name }}</h3>
-                                {% comment %} <p>{{ employee.user.email|default:"No email provided" }}</p> {% endcomment %}
+                                <p>{{ employee.email|default:"No email provided" }}</p>
                             </div>
                         </div>
 

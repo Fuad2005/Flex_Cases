@@ -1014,7 +1014,7 @@
                             <td>
                                 <div class="case-title-cell">
                                     <a href="/case/{{ case.id }}/" class="case-name">{{ case.name }}</a>
-                                    {% comment %} <span class="case-desc">{{ case.description|default:"No description provided." }}</span> {% endcomment %}
+                                    <span class="case-desc">{{ case.description|striptags|default:"No description provided." }}</span>
                                 </div>
                             </td>
 

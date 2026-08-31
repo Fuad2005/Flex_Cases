@@ -60,6 +60,7 @@ def add_employee(request):
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
         password = request.POST.get("password")
+        email = request.POST.get("email", "").strip()
         first_name = request.POST.get("first_name", "").strip()
         last_name = request.POST.get("last_name", "").strip()
         # person_type = request.POST.get("person_type", Person.PersonType.EMPLOYEE)
@@ -83,7 +84,8 @@ def add_employee(request):
                     user=user,
                     first_name=first_name,
                     last_name=last_name,
-                    person_type=person_type
+                    person_type=person_type,
+                    email=email
                 )
 
             messages.success(request, f"User {username} added successfully!", extra_tags="employee_created")

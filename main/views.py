@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
+from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Case, Value, IntegerField, When
@@ -8,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from . import models
 # from .utils import send_whatsapp_message
 from user import models as user_models
+from django.conf import settings
 import os
 import json
 
@@ -70,8 +72,84 @@ import json
 #         return HttpResponse('EVENT_RECEIVED', status=200)
 
 
+
+def send_new_case_notification(request, new_case, full_name):
+    # Retrieve emails for all active employees
+    employee_emails = list(
+        user_models.Person.objects.filter(person_type='employee')
+        .exclude(email__isnull=True)
+        .exclude(email__exact='')
+        .values_list('email', flat=True)
+    )
+
+    if not employee_emails:
+        return
+
+    # Build absolute URL for the case detail button
+    domain = request.get_host()
+    protocol = 'https' if request.is_secure() else 'http'
+    case_url = f"{protocol}://{domain}/case/{new_case.id}/"
+
+    subject = f"🆕 New Case Alert: Case from {full_name}"
+
+    # Plain text fallback
+    text_content = f"""
+Hello,
+
+A new case from {full_name} has been submitted and is ready to be reviewed.
+
+View details here: {case_url}
+"""
+
+    # HTML body with button
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; padding: 20px; }}
+        .header {{ font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #1a1a1a; }}
+        .button {{
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 14px;
+            color: #ffffff !important;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 15px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">New Case Submitted</div>
+        <p>There is a new case from <strong>{full_name}</strong> to be reviewed.</p>
+        <p>
+            <a href="{case_url}" class="button">View Case Detail</a>
+        </p>
+    </div>
+</body>
+</html>
+"""
+
+    # Construct and send email (using BCC to protect recipient privacy)
+    msg = EmailMultiAlternatives(
+        subject=subject,
+        body=text_content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[settings.DEFAULT_FROM_EMAIL],
+        bcc=employee_emails
+    )
+    msg.attach_alternative(html_content, "text/html")
+    msg.send(fail_silently=True)
+
 @csrf_exempt
 def google_form_webhook(request):
+    # Handle health-checks or manual browser checks
+    if request.method == 'GET':
+        return JsonResponse({'status': 'online', 'message': 'Google Form Webhook endpoint is active.'}, status=200)
     if request.method == 'POST':
         try:
             data = json.loads(request.body.decode('utf-8'))
@@ -105,6 +183,10 @@ def google_form_webhook(request):
             )
 
             print(f"\n✅ Case #{new_case.id} successfully created: '{new_case.name}'\n")
+
+            # Trigger email notification to employees
+            send_new_case_notification(request, new_case, full_name)
+
 
             return JsonResponse({'status': 'success', 'case_id': new_case.id}, status=201)
 
